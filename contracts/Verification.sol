@@ -15,6 +15,10 @@ contract Verification {
     }
   }
 
+  function isValid(string reportId) constant returns(bool isValid) {
+    return reports[reportId].isValid;
+  }
+
   function verifiersFor(string reportId) constant returns(address[] addresses) {
     return reports[reportId].validators;
   }
