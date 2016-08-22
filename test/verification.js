@@ -4,23 +4,35 @@ contract('Verification', function(accounts) {
   var bob = accounts[1];
   var carol = accounts[2];
 
+  function verify(reportId, account) {
+    return contract.verify(reportId, {from: account});
+  }
+
+  function isValid(reportId) {
+    return contract.isValid.call(reportId);
+  }
+
+  function verifiersFor(reportId) {
+    return contract.verifiersFor.call(reportId);
+  }
+
   beforeEach(function() {
     contract = Verification.deployed();
   });
 
   it('allows users to verify documents', function() {
-    return contract.verify('DOCUMENT_HASH', {from: alice}).then(function() {
-      return contract.verifiersFor.call('DOCUMENT_HASH').then(function(verifiers) {
+    return verify('DOCUMENT_HASH', alice).then(function() {
+      return verifiersFor('DOCUMENT_HASH').then(function(verifiers) {
         assert.sameDeepMembers(verifiers, [alice]);
       });
     })
   });
 
   it('lists a document as valid after three verifications', function() {
-    return contract.verify('2ND_DOCUMENT_HASH', {from: alice}).then(function() {
-      return contract.verify('2ND_DOCUMENT_HASH', {from: bob}).then(function() {
-        return contract.verify('2ND_DOCUMENT_HASH', {from: carol}).then(function() {
-          return contract.isValid.call('2ND_DOCUMENT_HASH').then(function(contractIsValid) {
+    return verify('2ND_DOCUMENT_HASH', alice).then(function() {
+      return verify('2ND_DOCUMENT_HASH', bob).then(function() {
+        return verify('2ND_DOCUMENT_HASH', carol).then(function() {
+          return isValid('2ND_DOCUMENT_HASH').then(function(contractIsValid) {
             assert.isTrue(contractIsValid);
           })
         });
