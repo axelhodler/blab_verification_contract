@@ -7,11 +7,12 @@ contract Verification {
   }
 
   function verify(string reportId) {
-    if(!reports[reportId].isValid) {
-      reports[reportId].validators.push(msg.sender);
+    Report r = reports[reportId];
+    if(!r.isValid) {
+      r.validators.push(msg.sender);
     }
-    if(reports[reportId].validators.length == 3) {
-      reports[reportId].isValid = true;
+    if(r.validators.length == 3) {
+      r.isValid = true;
     }
   }
 
