@@ -2,13 +2,15 @@ contract Verification {
   mapping (string => Report) reports;
 
   struct Report {
+    mapping (address => bool) hasValidated;
     address[] validators;
     bool isValid;
   }
 
   function verify(string reportId) {
     Report r = reports[reportId];
-    if(!r.isValid) {
+    if(!r.isValid && !r.hasValidated[msg.sender]) {
+      r.hasValidated[msg.sender] = true;
       r.validators.push(msg.sender);
     }
     if(r.validators.length == 3) {

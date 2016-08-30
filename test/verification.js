@@ -23,6 +23,7 @@ contract('Verification', function(accounts) {
   it('allows users to verify documents', function() {
     return verify('DOCUMENT_HASH', alice).then(function() {
       return verifiersFor('DOCUMENT_HASH').then(function(verifiers) {
+        assert.equal(verifiers.length, 1);
         assert.sameDeepMembers(verifiers, [alice]);
       });
     })
@@ -34,6 +35,28 @@ contract('Verification', function(accounts) {
         return verify('2ND_DOCUMENT_HASH', carol).then(function() {
           return isValid('2ND_DOCUMENT_HASH').then(function(contractIsValid) {
             assert.isTrue(contractIsValid);
+          })
+        });
+      });
+    });
+  });
+
+  it('cannot be verified by the same person twice', function() {
+    return verify('3ND_DOCUMENT_HASH', alice).then(function() {
+      return verify('3ND_DOCUMENT_HASH', alice).then(function() {
+        return verifiersFor('3ND_DOCUMENT_HASH').then(function(verifiers) {
+          assert.equal(verifiers.length, 1);
+        });
+      });
+    });
+  });
+
+  it('is not valid if the same person verifies it three times', function() {
+    return verify('4ND_DOCUMENT_HASH', alice).then(function() {
+      return verify('4ND_DOCUMENT_HASH', alice).then(function() {
+        return verify('4ND_DOCUMENT_HASH', alice).then(function() {
+          return isValid('4ND_DOCUMENT_HASH').then(function(contractIsValid) {
+            assert.isNotTrue(contractIsValid);
           })
         });
       });
