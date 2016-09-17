@@ -11,7 +11,7 @@ window.onload = function() {
     }
 
     document.getElementById('accounts').innerHTML = accs;
-    document.getElementById('contract-address').innerHTML = MetaCoin.deployed().address;
-    document.getElementById('contract-abi').innerHTML = JSON.stringify(MetaCoin.deployed().abi);
+    document.getElementById('contract-address').innerHTML = Verification.deployed().address;
+    document.getElementById('contract-abi').innerHTML = JSON.stringify(Verification.deployed().abi);
   });
 };
