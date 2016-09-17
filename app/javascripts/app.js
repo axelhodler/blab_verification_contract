@@ -10,7 +10,7 @@ window.onload = function() {
       return;
     }
 
-    document.getElementById('accounts').innerHTML = accs;
+    document.getElementById('coinbase').innerHTML = accs[0];
     document.getElementById('contract-address').innerHTML = Verification.deployed().address;
     document.getElementById('contract-abi').innerHTML = JSON.stringify(Verification.deployed().abi);
   });

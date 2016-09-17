@@ -6,20 +6,12 @@
 </head>
 <body>
 
-  <h1>Accounts</h1>
-  <div id="accounts">
-  </div>
-
-  <h1>Contract Address</h1>
-  <div id="contract-address">
-  </div>
-
-  <h1>Contract Abi</h1>
-  <div id="contract-abi">
+  <h1>Coinbase</h1>
+  <div id="coinbase">
   </div>
 
   <h1>Web3 Howto</h1>
-  <p>var contract = web3.eth.contract(abi).at(addr);</p>
+  <p>var contract = web3.eth.contract(<span id="contract-abi"></span>).at('<span id="contract-address"></span>');
   <p>Remember the abi is an array NOT a String</p>
 </body>
 </html>
