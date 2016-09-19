@@ -11,7 +11,10 @@ window.onload = function() {
     }
 
     document.getElementById('coinbase').innerHTML = accs[0];
-    document.getElementById('contract-address').innerHTML = Verification.deployed().address;
-    document.getElementById('contract-abi').innerHTML = JSON.stringify(Verification.deployed().abi);
+    var contract = 'var contract = web3.eth.contract(' + JSON.stringify(Verification.deployed().abi) + ').at("' + Verification.deployed().address + '");';
+    document.getElementById('contract').value = contract;
+
+    document.getElementById('verify').value = 'contract.verify("iShouldBeAHash", function() {});';
+    document.getElementById('validate').value = 'contract.isValid.call("iShouldBeAHash", function() { console.log(arguments[1]) });'
   });
 };

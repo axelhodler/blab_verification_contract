@@ -2,18 +2,67 @@
 <html>
 <head>
   <link href="./app.css" rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://cdn.rawgit.com/zenorocha/clipboard.js/v1.5.12/dist/clipboard.min.js"></script>
+  <script src="https://use.fontawesome.com/7031f78bd4.js"></script>
   <script src="./app.js"></script>
+
+
 </head>
 <body>
+<script>
+  new Clipboard('.btn');
+</script>
 
-  <h1>Coinbase</h1>
-  <div id="coinbase">
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>Coinbase</h1>
+      <div id="coinbase">
+      </div>
+
+      <h1>Usage</h1>
+      <p>Remember the abi is an array NOT a String</p>
+
+      <div class="input-group">
+        <input id="contract"
+               type="text"
+               value="">
+        <span class="input-group-button">
+          <button class="btn"
+                  data-clipboard-target="#contract">
+           <i class="fa fa-clipboard"></i>
+          </button>
+        </span>
+      </div>
+
+      <div class="input-group">
+        <input id="verify"
+               type="text"
+               value="">
+        <span class="input-group-button">
+          <button class="btn"
+                  data-clipboard-target="#verify">
+           <i class="fa fa-clipboard"></i>
+          </button>
+        </span>
+      </div>
+
+      <div class="input-group">
+        <input id="validate"
+               type="text"
+               value="">
+        <span class="input-group-button">
+          <button class="btn"
+                  data-clipboard-target="#validate">
+           <i class="fa fa-clipboard"></i>
+          </button>
+        </span>
+      </div>
+    </div>
   </div>
+</div>
 
-  <h1>Usage</h1>
-  <p>Remember the abi is an array NOT a String</p>
-  <p>var contract = web3.eth.contract(<span id="contract-abi"></span>).at('<span id="contract-address"></span>');
-  <p>contract.verify('iShouldBeAHash', function() {});</p>
-  <p>contract.isValid.call('iShouldBeAHash', function() { console.log(arguments[1]) });</p>
 </body>
 </html>
