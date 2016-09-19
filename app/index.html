@@ -13,7 +13,7 @@
   <h1>Usage</h1>
   <p>Remember the abi is an array NOT a String</p>
   <p>var contract = web3.eth.contract(<span id="contract-abi"></span>).at('<span id="contract-address"></span>');
-  <p>contract.verify('iShouldBeAHash', { from: coinbase.innerHTML }, function() {});</p>
+  <p>contract.verify('iShouldBeAHash', function() {});</p>
   <p>contract.isValid.call('iShouldBeAHash', function() { console.log(arguments[1]) });</p>
 </body>
 </html>
