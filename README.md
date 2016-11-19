@@ -4,6 +4,6 @@
 
 make sure `testrpc` is running on port 8545.
 
-    truffle migrate
-    truffle serve
+    ./truffle.sh migrate
+    ./truffle.sh serve
 
