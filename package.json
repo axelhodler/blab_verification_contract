@@ -1,0 +1,8 @@
+{
+  "name": "blab_verification_contract",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "truffle": "2.1.1"
+  }
+}
