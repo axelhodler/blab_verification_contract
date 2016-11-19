@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "devDependencies": {
+    "solc": "0.4.4",
     "truffle": "2.1.1"
   }
 }
