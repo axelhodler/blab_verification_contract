@@ -1,3 +1,5 @@
+pragma solidity ^0.4.2;
+
 contract Verification {
   mapping (string => Report) reports;
 
