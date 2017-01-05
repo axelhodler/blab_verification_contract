@@ -5,4 +5,9 @@
 CONTRACT_ADDRESS=`./truffle.sh migrate | grep Verification: | awk '{print $2}'`
 CONTRACT_ABI=`node bin/getabi.js`
 
+if [ ${#CONTRACT_ADDRESS} != 42 ]; then
+  echo "Contract Address could not be resolved, exitting.."
+  exit
+fi
+
 echo $CONTRACT_ADDRESS $CONTRACT_ABI
