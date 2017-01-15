@@ -4,7 +4,7 @@
   "private": true,
   "devDependencies": {
     "ethereumjs-testrpc": "3.0.2",
-    "solc": "0.4.4",
+    "solc": "0.4.8",
     "truffle": "2.1.1"
   }
 }
