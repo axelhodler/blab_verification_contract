@@ -21,13 +21,20 @@ contract('Verification', (accounts) => {
   });
 
   describe('submitting a report', () => {
+    const report = 'DOCUMENT_HASH_0';
+
     it('sets the submitter in the report', () => {
-      const report = 'DOCUMENT_HASH_0';
       return contract.submit(report, {from: alice}).then(() => {
         return contract.submitterFor.call(report).then((submitter) => {
           assert.equal(submitter, alice);
         })
       })
+    });
+
+    it('is not allowed to submit the same report twice', () => {
+      return contract.submit(report, {from: alice}).catch(() => {
+        assert.ok(true);
+      });
     });
   });
 

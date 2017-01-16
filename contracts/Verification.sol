@@ -11,6 +11,7 @@ contract Verification {
   }
 
   function submit(string reportId) {
+    if (reports[reportId].submitter != address(0)) throw;
     Report r = reports[reportId];
     r.submitter = msg.sender;
   }
