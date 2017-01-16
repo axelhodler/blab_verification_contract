@@ -1,19 +1,23 @@
 contract('Verification', (accounts) => {
-  var contract;
-  var alice = accounts[0];
-  var bob = accounts[1];
-  var carol = accounts[2];
+  let contract;
+  let alice = accounts[0];
+  let bob = accounts[1];
+  let carol = accounts[2];
 
-  var verify = (reportId, account) => {
+  let verify = (reportId, account) => {
     return contract.verify(reportId, {from: account});
   };
 
-  var isValid = (reportId) => {
+  let isValid = (reportId) => {
     return contract.isValid.call(reportId);
   };
 
-  var verifiersFor = (reportId) => {
+  let verifiersFor = (reportId) => {
     return contract.verifiersFor.call(reportId);
+  };
+
+  let submit = (reportId, account) => {
+    return contract.submit(reportId, {from: account})
   };
 
   beforeEach(() => {
@@ -24,7 +28,7 @@ contract('Verification', (accounts) => {
     const report = 'DOCUMENT_HASH_0';
 
     it('sets the submitter in the report', () => {
-      return contract.submit(report, {from: alice}).then(() => {
+      return submit(report, alice).then(() => {
         return contract.submitterFor.call(report).then((submitter) => {
           assert.equal(submitter, alice);
         })
@@ -32,7 +36,7 @@ contract('Verification', (accounts) => {
     });
 
     it('is not allowed to submit the same report twice', () => {
-      return contract.submit(report, {from: alice}).catch(() => {
+      return submit(report, alice).catch(() => {
         assert.ok(true);
       });
     });
