@@ -20,6 +20,17 @@ contract('Verification', (accounts) => {
     contract = Verification.deployed();
   });
 
+  describe('submitting a report', () => {
+    it('sets the submitter in the report', () => {
+      const report = 'DOCUMENT_HASH_0';
+      return contract.submit(report, {from: alice}).then(() => {
+        return contract.submitterFor.call(report).then((submitter) => {
+          assert.equal(submitter, alice);
+        })
+      })
+    });
+  });
+
   it('allows users to verify documents', () => {
     return verify('DOCUMENT_HASH', alice).then(() => {
       return verifiersFor('DOCUMENT_HASH').then((verifiers) => {

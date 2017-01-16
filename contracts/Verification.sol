@@ -4,9 +4,15 @@ contract Verification {
   mapping (string => Report) reports;
 
   struct Report {
+    address submitter;
     mapping (address => bool) hasValidated;
     address[] validators;
     bool isValid;
+  }
+
+  function submit(string reportId) {
+    Report r = reports[reportId];
+    r.submitter = msg.sender;
   }
 
   function verify(string reportId) {
@@ -22,6 +28,10 @@ contract Verification {
 
   function isValid(string reportId) constant returns(bool isValid) {
     return reports[reportId].isValid;
+  }
+
+  function submitterFor(string reportId) constant returns(address submitter) {
+    return reports[reportId].submitter;
   }
 
   function verifiersFor(string reportId) constant returns(address[] addresses) {
