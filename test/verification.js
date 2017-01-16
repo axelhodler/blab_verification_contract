@@ -35,9 +35,13 @@ contract('Verification', (accounts) => {
       })
     });
 
-    it('is not allowed to submit the same report twice', () => {
+    it('is not allowed to submit the same report twice', (done) => {
       return submit(report, alice).catch(() => {
         assert.ok(true);
+        done();
+      }).then(() => {
+        assert.fail();
+        done();
       });
     });
   });
