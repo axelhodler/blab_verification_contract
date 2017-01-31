@@ -47,16 +47,16 @@ contract('Verification', (accounts) => {
   });
 
   it('allows users to verify documents', () => {
-    return verify('DOCUMENT_HASH', alice).then(() => {
+    return submit('DOCUMENT_HASH', alice).then(() => {
       return verifiersFor('DOCUMENT_HASH').then((verifiers) => {
-        assert.equal(verifiers.length, 1);
-        assert.sameDeepMembers(verifiers, [alice]);
+        assert.equal(verifiers.length, 0);
+        assert.sameDeepMembers(verifiers, []);
       });
     })
   });
 
-  it('lists a document as valid after three verifications', () => {
-    return verify('2ND_DOCUMENT_HASH', alice).then(() => {
+  it('lists a document as valid after two verifications', () => {
+    return submit('2ND_DOCUMENT_HASH', alice).then(() => {
       return verify('2ND_DOCUMENT_HASH', bob).then(() => {
         return verify('2ND_DOCUMENT_HASH', carol).then(() => {
           return isValid('2ND_DOCUMENT_HASH').then((contractIsValid) => {
@@ -68,24 +68,25 @@ contract('Verification', (accounts) => {
   });
 
   it('cannot be verified by the same person twice', () => {
-    return verify('3ND_DOCUMENT_HASH', alice).then(() => {
-      return verify('3ND_DOCUMENT_HASH', alice).then(() => {
-        return verifiersFor('3ND_DOCUMENT_HASH').then((verifiers) => {
-          assert.equal(verifiers.length, 1);
+    return submit('3ND_DOCUMENT_HASH', alice).then(() => {
+      return verify('3ND_DOCUMENT_HASH', bob).then(() => {
+        return verify('3ND_DOCUMENT_HASH', bob).then(() => {
+          return verifiersFor('3ND_DOCUMENT_HASH').then((verifiers) => {
+            assert.equal(verifiers.length, 1);
+          });
         });
       });
     });
   });
 
-  it('is not valid if the same person verifies it three times', () => {
-    return verify('4ND_DOCUMENT_HASH', alice).then(() => {
-      return verify('4ND_DOCUMENT_HASH', alice).then(() => {
-        return verify('4ND_DOCUMENT_HASH', alice).then(() => {
-          return isValid('4ND_DOCUMENT_HASH').then((contractIsValid) => {
-            assert.isNotTrue(contractIsValid);
-          })
-        });
+  it('is not possible to verify an unsubmitted report', (done) => {
+    return verify('5ND_DOCUMENT_HASH', alice)
+      .catch(() => {
+        assert.ok(true);
+        done();
+      }).then(() => {
+        assert.fail();
+        done();
       });
-    });
   });
 });

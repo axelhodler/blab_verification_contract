@@ -18,11 +18,12 @@ contract Verification {
 
   function verify(string reportId) {
     Report r = reports[reportId];
+    if (r.submitter == address(0)) throw;
     if(!r.isValid && !r.hasValidated[msg.sender]) {
       r.hasValidated[msg.sender] = true;
       r.validators.push(msg.sender);
     }
-    if(r.validators.length == 3) {
+    if(r.validators.length == 2) {
       r.isValid = true;
     }
   }
