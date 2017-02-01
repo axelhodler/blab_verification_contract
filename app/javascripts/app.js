@@ -14,6 +14,7 @@ window.onload = function() {
     var contract = 'var contract = web3.eth.contract(' + JSON.stringify(Verification.deployed().abi) + ').at("' + Verification.deployed().address + '");';
     document.getElementById('contract').value = contract;
 
+    document.getElementById('submit').value = 'contract.submit("iShouldBeAHash", function() {});';
     document.getElementById('verify').value = 'contract.verify("iShouldBeAHash", function() {});';
     document.getElementById('validate').value = 'contract.isValid.call("iShouldBeAHash", function() { console.log(arguments[1]) });'
   });
