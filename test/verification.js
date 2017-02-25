@@ -1,3 +1,5 @@
+var Verification = artifacts.require("./Verification.sol")
+
 contract('Verification', (accounts) => {
   let contract;
   let alice = accounts[0];
@@ -21,7 +23,9 @@ contract('Verification', (accounts) => {
   };
 
   beforeEach(() => {
-    contract = Verification.deployed();
+    return Verification.deployed().then(instance => {
+      contract = instance;
+    });
   });
 
   describe('submitting a report', () => {
@@ -36,7 +40,7 @@ contract('Verification', (accounts) => {
     });
 
     it('is not allowed to submit the same report twice', (done) => {
-      return submit(report, alice).catch(() => {
+      submit(report, alice).catch(() => {
         assert.ok(true);
         done();
       }).then(() => {
@@ -80,7 +84,7 @@ contract('Verification', (accounts) => {
   });
 
   it('is not possible to verify an unsubmitted report', (done) => {
-    return verify('5ND_DOCUMENT_HASH', alice)
+    verify('5ND_DOCUMENT_HASH', alice)
       .catch(() => {
         assert.ok(true);
         done();
