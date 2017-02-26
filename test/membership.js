@@ -7,8 +7,12 @@ contract('Membership', (accounts) => {
     })
   })
 
-  it('has no members', () => {
+  it('knows who is a member', () => {
     return contract.isMember.call(accounts[0]).then(isMember => {
+      return assert.isTrue(isMember)
+    }).then(() => {
+      return contract.isMember.call(accounts[3])
+    }).then(isMember => {
       assert.isFalse(isMember)
     })
   })
