@@ -95,6 +95,17 @@ contract('Verification', accounts => {
       })
     })
 
+    it('is not possible for a nonmember to verify a report', done => {
+      submit('4TH_DOCUMENT_HASH', alice).then(() => {
+        return verify('4TH_DOCUMENT_HASH', NERO_THE_NONMEMBER);
+      }).catch(() => {
+        done()
+      }).then(() => {
+        assert.fail()
+        done()
+      })
+    })
+
     it('is not possible to verify an unsubmitted report', done => {
       verify('5ND_DOCUMENT_HASH', alice)
         .catch(() => {

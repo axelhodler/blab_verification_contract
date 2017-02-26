@@ -28,7 +28,7 @@ contract Verification {
     r.submitter = msg.sender;
   }
 
-  function verify(string reportId) {
+  function verify(string reportId) onlyByMember {
     Report r = reports[reportId];
     if (r.submitter == address(0)) throw;
     if(!r.isValid && !r.hasValidated[msg.sender]) {
