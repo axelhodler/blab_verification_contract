@@ -1,7 +1,10 @@
 pragma solidity ^0.4.8;
 
+import "./Membership.sol";
+
 contract Verification {
   mapping (string => Report) reports;
+  Membership membership;
 
   struct Report {
     address submitter;
@@ -10,7 +13,16 @@ contract Verification {
     bool isValid;
   }
 
-  function submit(string reportId) {
+  modifier onlyByMember() {
+    if (!membership.isMember(msg.sender)) throw;
+    _;
+  }
+
+  function Verification(address membershipContractAddress) {
+    membership = Membership(membershipContractAddress);
+  }
+
+  function submit(string reportId) onlyByMember {
     if (reports[reportId].submitter != address(0)) throw;
     Report r = reports[reportId];
     r.submitter = msg.sender;

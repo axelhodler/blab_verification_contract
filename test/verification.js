@@ -5,6 +5,7 @@ contract('Verification', (accounts) => {
   let alice = accounts[0];
   let bob = accounts[1];
   let carol = accounts[2];
+  let NERO_THE_NONMEMBER = accounts[3];
 
   let verify = (reportId, account) => {
     return contract.verify(reportId, {from: account});
@@ -39,7 +40,7 @@ contract('Verification', (accounts) => {
       })
     });
 
-    it('is not allowed to submit the same report twice', (done) => {
+    it('is not allowed to submit the same report twice', done => {
       submit(report, alice).catch(() => {
         assert.ok(true);
         done();
@@ -48,7 +49,17 @@ contract('Verification', (accounts) => {
         done();
       });
     });
-  });
+
+    it('is not allowed for nonmembers', done => {
+      submit('NONMEMBER_REPORT', NERO_THE_NONMEMBER).catch(() => {
+        assert.ok(true)
+        done()
+      }).then(() => {
+        assert.fail()
+        done()
+      })
+    })
+  })
 
   it('allows users to verify documents', () => {
     return submit('DOCUMENT_HASH', alice).then(() => {
