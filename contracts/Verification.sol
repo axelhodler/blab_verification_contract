@@ -4,7 +4,7 @@ import "./Membership.sol";
 
 contract Verification {
   mapping (string => Report) reports;
-  Membership membership;
+  Membership public membership;
 
   struct Report {
     address submitter;

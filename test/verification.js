@@ -1,7 +1,9 @@
 var Verification = artifacts.require("./Verification.sol")
+var Membership = artifacts.require("./Membership.sol")
 
 contract('Verification', accounts => {
   let contract
+  let membershipContractAddress
   let alice = accounts[0]
   let bob = accounts[1]
   let carol = accounts[2]
@@ -26,6 +28,18 @@ contract('Verification', accounts => {
   beforeEach(() => {
     return Verification.deployed().then(instance => {
       contract = instance
+    }).then(() => {
+      return Membership.deployed()
+    }).then(membershipContract => {
+      membershipContractAddress = membershipContract.address
+    })
+  })
+
+  describe('setup', () => {
+    it('knows the connected membership contract address', () => {
+      return contract.membership.call().then(membershipAddress => {
+        assert.equal(membershipAddress, membershipContractAddress)
+      })
     })
   })
 
