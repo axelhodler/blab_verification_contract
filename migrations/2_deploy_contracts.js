@@ -10,6 +10,8 @@ module.exports = function(deployer) {
   }).then(membershipContractAddress => {
     return deployer.deploy(Verification, membershipContractAddress)
   }).then(() => {
-    return deployer.deploy(Token)
+    return Verification.deployed()
+  }).then(verificationContract => {
+    return deployer.deploy(Token, verificationContract.address)
   })
 }

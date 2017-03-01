@@ -1,49 +1,43 @@
 var token = artifacts.require('./Token.sol')
+var verification = artifacts.require('./Verification')
 
-contract('token', function(accounts) {
-  let tokenContract;
+contract('token - creation', accounts => {
+  const CONTRACT_CREATOR = accounts[0]
+  let verificationContractAddress
+  let tokenContract
 
   beforeEach(() => {
-    return token.deployed().then(instance => {
+    return verification.deployed().then(instance => {
+      verificationContractAddress = instance.address
+    }).then(() => {
+      return token.deployed()
+    }).then(instance => {
       tokenContract = instance;
     })
   })
 
-  it('puts 100000 Tokens into the first account', function() {
-    return tokenContract.getBalance.call(accounts[0]).then(balance => {
-      assert.equal(balance.valueOf(), 100000, '100000 was not in the first account')
+  it('initially sets the contract creator as owner', () => {
+    tokenContract.owner.call().then(contractOwner => {
+      assert.equal(contractOwner, CONTRACT_CREATOR)
     })
   })
 
-  it('sends coin correctly', function() {
-    let meta = tokenContract;
+  describe('setting up the wiring', () => {
+    before(() => {
+      return tokenContract.setUpWiring(verificationContractAddress, {from: CONTRACT_CREATOR})
+    })
 
-    var account_one = accounts[0]
-    var account_two = accounts[1]
+    it('gives 100000 Tokens to the verification contract after setting up the wiring', function() {
+      return tokenContract.getBalance.call(verificationContractAddress).then(balance => {
+        assert.equal(balance.valueOf(), 100000)
+      })
+    })
 
-    var account_one_starting_balance
-    var account_two_starting_balance
-    var account_one_ending_balance
-    var account_two_ending_balance
-
-    var amount = 10
-
-    return meta.getBalance.call(account_one).then(function(balance) {
-      account_one_starting_balance = balance.toNumber()
-      return meta.getBalance.call(account_two)
-    }).then(function(balance) {
-      account_two_starting_balance = balance.toNumber()
-      return meta.sendCoin(account_two, amount, {from: account_one})
-    }).then(function() {
-      return meta.getBalance.call(account_one)
-    }).then(function(balance) {
-      account_one_ending_balance = balance.toNumber()
-      return meta.getBalance.call(account_two)
-    }).then(function(balance) {
-      account_two_ending_balance = balance.toNumber()
-
-      assert.equal(account_one_ending_balance, account_one_starting_balance - amount, 'Amount wasn not correctly taken from the sender')
-      assert.equal(account_two_ending_balance, account_two_starting_balance + amount, 'Amount wasn not correctly sent to the receiver')
+    it('sets the verificationcontract as the new owner', () => {
+      return tokenContract.owner.call().then(updatedOwner => {
+        assert.equal(updatedOwner, verificationContractAddress)
+      })
     })
   })
+
 })
