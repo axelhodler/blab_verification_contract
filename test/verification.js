@@ -1,9 +1,11 @@
-var Verification = artifacts.require("./Verification.sol")
-var Membership = artifacts.require("./Membership.sol")
+var Verification = artifacts.require('./Verification.sol')
+var Token = artifacts.require('./Token.sol')
+var Membership = artifacts.require('./Membership.sol')
 
 contract('Verification', accounts => {
   let contract
   let membershipContractAddress
+  let tokenContractAddress
   let alice = accounts[0]
   let bob = accounts[1]
   let carol = accounts[2]
@@ -32,6 +34,13 @@ contract('Verification', accounts => {
       return Membership.deployed()
     }).then(membershipContract => {
       membershipContractAddress = membershipContract.address
+    }).then(() => {
+      return Token.deployed()
+    }).then(tokenContract => {
+      tokenContractAddress = tokenContract.address
+      return tokenContract.setUpWiring(contract.address, {
+        from: alice
+      })
     })
   })
 
@@ -39,6 +48,12 @@ contract('Verification', accounts => {
     it('knows the connected membership contract address', () => {
       return contract.membership.call().then(membershipAddress => {
         assert.equal(membershipAddress, membershipContractAddress)
+      })
+    })
+
+    it('knows the connected token contract address', () => {
+      return contract.token.call().then(tokenAddress => {
+        assert.equal(tokenAddress, tokenContractAddress)
       })
     })
   })
@@ -128,6 +143,20 @@ contract('Verification', accounts => {
         }).then(() => {
         assert.fail()
         done()
+      })
+    })
+
+    it('provides 100 tokens to the submitter after its fully verified', () => {
+      return submit('WORK_DONE', bob).then(() => {
+        return verify('WORK_DONE', alice)
+      }).then(() => {
+        return verify('WORK_DONE', carol)
+      }).then(() => {
+        return Token.deployed()
+      }).then(tokenContract => {
+        return tokenContract.getBalance.call(bob)
+      }).then(bobsTokenAmount => {
+        assert.equal(bobsTokenAmount.valueOf(), 100)
       })
     })
   })

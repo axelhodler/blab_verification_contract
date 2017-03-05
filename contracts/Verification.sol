@@ -1,10 +1,12 @@
 pragma solidity ^0.4.8;
 
 import "./Membership.sol";
+import "./Token.sol";
 
 contract Verification {
   mapping (string => Report) reports;
   Membership public membership;
+  Token public token;
 
   struct Report {
     address submitter;
@@ -18,8 +20,9 @@ contract Verification {
     _;
   }
 
-  function Verification(address membershipContractAddress) {
+  function Verification(address membershipContractAddress, address tokenContractAddress) {
     membership = Membership(membershipContractAddress);
+    token = Token(tokenContractAddress);
   }
 
   function submit(string reportId) onlyByMember {
@@ -37,6 +40,7 @@ contract Verification {
     }
     if(r.validators.length == 2) {
       r.isValid = true;
+      token.sendCoin(r.submitter, 100);
     }
   }
 
