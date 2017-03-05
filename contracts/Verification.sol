@@ -11,6 +11,7 @@ contract Verification {
   struct Report {
     address submitter;
     mapping (address => bool) hasValidated;
+    uint compensation;
     address[] validators;
     bool isValid;
   }
@@ -25,10 +26,11 @@ contract Verification {
     token = Token(tokenContractAddress);
   }
 
-  function submit(string reportId) onlyByMember {
+  function submit(string reportId, uint compensation) onlyByMember {
     if (reports[reportId].submitter != address(0)) throw;
     Report r = reports[reportId];
     r.submitter = msg.sender;
+    r.compensation = compensation;
   }
 
   function verify(string reportId) onlyByMember {
@@ -40,7 +42,7 @@ contract Verification {
     }
     if(r.validators.length == 2) {
       r.isValid = true;
-      token.sendCoin(r.submitter, 100);
+      token.sendCoin(r.submitter, r.compensation);
     }
   }
 

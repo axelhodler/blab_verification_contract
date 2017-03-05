@@ -24,7 +24,7 @@ contract('Verification', accounts => {
   }
 
   let submit = (reportId, account) => {
-    return contract.submit(reportId, {from: account})
+    return contract.submit(reportId, 100, {from: account})
   }
 
   beforeEach(() => {
