@@ -22,7 +22,7 @@ contract Token {
       balances[msg.sender] -= amount;
       balances[receiver] += amount;
       return true;
-    }
+  }
 
   function getBalance(address addr) constant returns(uint) {
     return balances[addr];
