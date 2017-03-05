@@ -1,7 +1,7 @@
 pragma solidity ^0.4.2;
 
 contract Token {
-  bool public fullyInitialized;
+  bool public initialized;
   address public owner;
   mapping (address => uint) balances;
 
@@ -10,10 +10,10 @@ contract Token {
   }
 
   function setUpWiring(address verificationContract) {
-    if (msg.sender == owner && !fullyInitialized) {
+    if (msg.sender == owner && !initialized) {
       owner = verificationContract;
       balances[owner] = 100000;
-      fullyInitialized = true;
+      initialized = true;
     }
   }
 
