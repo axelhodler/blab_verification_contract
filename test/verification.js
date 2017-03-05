@@ -63,9 +63,9 @@ contract('Verification', accounts => {
 
     it('sets the submitter in the report', () => {
       return submit(report, alice).then(() => {
-        return contract.submitterFor.call(report).then((submitter) => {
-          assert.equal(submitter, alice)
-        })
+        return contract.submitterFor.call(report)
+      }).then((submitter) => {
+        assert.equal(submitter, alice)
       })
     })
 
@@ -93,71 +93,71 @@ contract('Verification', accounts => {
   describe('verifying documents', () => {
     it('allows users to verify documents', () => {
       return submit('DOCUMENT_HASH', alice).then(() => {
-        return verifiersFor('DOCUMENT_HASH').then((verifiers) => {
-          assert.equal(verifiers.length, 0)
-          assert.sameDeepMembers(verifiers, [])
-        })
+        return verifiersFor('DOCUMENT_HASH')
+      }).then(verifiers => {
+        assert.equal(verifiers.length, 0)
+        assert.sameDeepMembers(verifiers, [])
       })
     })
+  })
 
-    it('lists a document as valid after two verifications', () => {
-      return submit('2ND_DOCUMENT_HASH', alice).then(() => {
-        return verify('2ND_DOCUMENT_HASH', bob).then(() => {
-          return verify('2ND_DOCUMENT_HASH', carol).then(() => {
-            return isValid('2ND_DOCUMENT_HASH').then((contractIsValid) => {
-              assert.isTrue(contractIsValid)
-            })
-          })
-        })
-      })
+  it('lists a document as valid after two verifications', () => {
+    return submit('2ND_DOCUMENT_HASH', alice).then(() => {
+      return verify('2ND_DOCUMENT_HASH', bob)
+    }).then(() => {
+      return verify('2ND_DOCUMENT_HASH', carol)
+    }).then(() => {
+      return isValid('2ND_DOCUMENT_HASH')
+    }).then(contractIsValid => {
+      assert.isTrue(contractIsValid)
     })
+  })
 
-    it('cannot be verified by the same person twice', () => {
-      return submit('3ND_DOCUMENT_HASH', alice).then(() => {
-        return verify('3ND_DOCUMENT_HASH', bob).then(() => {
-          return verify('3ND_DOCUMENT_HASH', bob).then(() => {
-            return verifiersFor('3ND_DOCUMENT_HASH').then((verifiers) => {
-              assert.equal(verifiers.length, 1)
-            })
-          })
-        })
-      })
+  it('cannot be verified by the same person twice', () => {
+    return submit('3ND_DOCUMENT_HASH', alice).then(() => {
+      return verify('3ND_DOCUMENT_HASH', bob)
+    }).then(() => {
+      return verify('3ND_DOCUMENT_HASH', bob)
+    }).then(() => {
+      return verifiersFor('3ND_DOCUMENT_HASH')
+    }).then((verifiers) => {
+      assert.equal(verifiers.length, 1)
     })
+  })
 
-    it('is not possible for a nonmember to verify a report', done => {
-      submit('4TH_DOCUMENT_HASH', alice).then(() => {
-        return verify('4TH_DOCUMENT_HASH', NERO_THE_NONMEMBER);
-      }).catch(() => {
+  it('is not possible for a nonmember to verify a report', done => {
+    submit('4TH_DOCUMENT_HASH', alice).then(() => {
+      return verify('4TH_DOCUMENT_HASH', NERO_THE_NONMEMBER);
+    }).catch(() => {
+      done()
+    }).then(() => {
+      assert.fail()
+      done()
+    })
+  })
+
+  it('is not possible to verify an unsubmitted report', done => {
+    verify('5ND_DOCUMENT_HASH', alice)
+      .catch(() => {
+        assert.ok(true)
         done()
       }).then(() => {
-        assert.fail()
-        done()
-      })
+      assert.fail()
+      done()
     })
+  })
 
-    it('is not possible to verify an unsubmitted report', done => {
-      verify('5ND_DOCUMENT_HASH', alice)
-        .catch(() => {
-          assert.ok(true)
-          done()
-        }).then(() => {
-        assert.fail()
-        done()
-      })
-    })
-
-    it('provides 100 tokens to the submitter after its fully verified', () => {
-      return submit('WORK_DONE', bob).then(() => {
-        return verify('WORK_DONE', alice)
-      }).then(() => {
-        return verify('WORK_DONE', carol)
-      }).then(() => {
-        return Token.deployed()
-      }).then(tokenContract => {
-        return tokenContract.getBalance.call(bob)
-      }).then(bobsTokenAmount => {
-        assert.equal(bobsTokenAmount.valueOf(), 100)
-      })
+  it('provides 100 tokens to the submitter after its fully verified', () => {
+    return submit('WORK_DONE', bob).then(() => {
+      return verify('WORK_DONE', alice)
+    }).then(() => {
+      return verify('WORK_DONE', carol)
+    }).then(() => {
+      return Token.deployed()
+    }).then(tokenContract => {
+      return tokenContract.getBalance.call(bob)
+    }).then(bobsTokenAmount => {
+      assert.equal(bobsTokenAmount.valueOf(), 100)
     })
   })
 })
