@@ -23,6 +23,10 @@ contract('Verification', accounts => {
     return contract.verifiersFor.call(reportId)
   }
 
+  let submitWithCustomCompensation = (reportId, compensation, account) => {
+    return contract.submit(reportId, compensation, {from: account})
+  }
+
   let submit = (reportId, account) => {
     return contract.submit(reportId, 100, {from: account})
   }
@@ -147,8 +151,9 @@ contract('Verification', accounts => {
     })
   })
 
-  it('provides 100 tokens to the submitter after its fully verified', () => {
-    return submit('WORK_DONE', bob).then(() => {
+  it('provides the amount of tokens the submitter chose after its fully verified', () => {
+    const CHOSEN_COMPENSATION = 200;
+    return submitWithCustomCompensation('WORK_DONE', CHOSEN_COMPENSATION, bob).then(() => {
       return verify('WORK_DONE', alice)
     }).then(() => {
       return verify('WORK_DONE', carol)
@@ -157,7 +162,7 @@ contract('Verification', accounts => {
     }).then(tokenContract => {
       return tokenContract.getBalance.call(bob)
     }).then(bobsTokenAmount => {
-      assert.equal(bobsTokenAmount.valueOf(), 100)
+      assert.equal(bobsTokenAmount.valueOf(), CHOSEN_COMPENSATION)
     })
   })
 })
