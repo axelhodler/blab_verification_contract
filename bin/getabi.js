@@ -3,8 +3,10 @@ var fs = require('fs')
 
 var membershipContract = fs.readFileSync('contracts/Membership.sol').toString()
 var verificationContract = fs.readFileSync('contracts/Verification.sol').toString()
+var tokenContract = fs.readFileSync('contracts/Token.sol').toString()
 
 var input = {
+  'Token.sol': tokenContract,
   'Membership.sol': membershipContract,
   'Verification.sol': verificationContract
 }
