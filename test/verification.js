@@ -3,61 +3,64 @@ var Token = artifacts.require('./Token.sol')
 var Membership = artifacts.require('./Membership.sol')
 
 contract('Verification', accounts => {
-  let contract
+  let verificationContract
+  let tokenContract
   let membershipContractAddress
-  let tokenContractAddress
   let alice = accounts[0]
   let bob = accounts[1]
   let carol = accounts[2]
   let NERO_THE_NONMEMBER = accounts[3]
 
   let verify = (reportId, account) => {
-    return contract.verify(reportId, {from: account})
+    return verificationContract.verify(reportId, {from: account})
   }
 
   let isValid = (reportId) => {
-    return contract.isValid.call(reportId)
+    return verificationContract.isValid.call(reportId)
   }
 
   let verifiersFor = (reportId) => {
-    return contract.verifiersFor.call(reportId)
+    return verificationContract.verifiersFor.call(reportId)
   }
 
   let submitWithCustomCompensation = (reportId, compensation, account) => {
-    return contract.submit(reportId, compensation, {from: account})
+    return verificationContract.submit(reportId, compensation, {from: account})
   }
 
   let submit = (reportId, account) => {
-    return contract.submit(reportId, 100, {from: account})
+    return verificationContract.submit(reportId, 100, {from: account})
   }
 
   beforeEach(() => {
     return Verification.deployed().then(instance => {
-      contract = instance
+      verificationContract = instance
     }).then(() => {
       return Membership.deployed()
     }).then(membershipContract => {
       membershipContractAddress = membershipContract.address
     }).then(() => {
-      return Token.deployed()
-    }).then(tokenContract => {
-      tokenContractAddress = tokenContract.address
-      return tokenContract.setUpWiring(contract.address, {
-        from: alice
-      })
+      return verificationContract.token.call()
+    }).then(tokenContractAddress => {
+      tokenContract = web3.eth.contract(Token.abi).at(tokenContractAddress)
     })
   })
 
   describe('setup', () => {
     it('knows the connected membership contract address', () => {
-      return contract.membership.call().then(membershipAddress => {
+      return verificationContract.membership.call().then(membershipAddress => {
         assert.equal(membershipAddress, membershipContractAddress)
       })
     })
 
     it('knows the connected token contract address', () => {
-      return contract.token.call().then(tokenAddress => {
-        assert.equal(tokenAddress, tokenContractAddress)
+      return verificationContract.token.call().then(tokenAddress => {
+        assert.equal(tokenAddress, tokenContract.address)
+      })
+    })
+
+    it('is owner of the token contract', () => {
+      return tokenContract.owner.call((err, ownerAddress) => {
+        assert.equal(ownerAddress, verificationContract.address)
       })
     })
   })
@@ -67,7 +70,7 @@ contract('Verification', accounts => {
 
     it('sets the submitter in the report', () => {
       return submit(report, alice).then(() => {
-        return contract.submitterFor.call(report)
+        return verificationContract.submitterFor.call(report)
       }).then((submitter) => {
         assert.equal(submitter, alice)
       })
@@ -151,18 +154,17 @@ contract('Verification', accounts => {
     })
   })
 
-  it('provides the amount of tokens the submitter chose after its fully verified', () => {
+  it('provides the amount of tokens the submitter chose after its fully verified', (done) => {
     const CHOSEN_COMPENSATION = 200;
-    return submitWithCustomCompensation('WORK_DONE', CHOSEN_COMPENSATION, bob).then(() => {
+    submitWithCustomCompensation('WORK_DONE', CHOSEN_COMPENSATION, bob).then(() => {
       return verify('WORK_DONE', alice)
     }).then(() => {
       return verify('WORK_DONE', carol)
     }).then(() => {
-      return Token.deployed()
-    }).then(tokenContract => {
-      return tokenContract.getBalance.call(bob)
-    }).then(bobsTokenAmount => {
-      assert.equal(bobsTokenAmount.valueOf(), CHOSEN_COMPENSATION)
+      tokenContract.getBalance.call(bob, (err, bobsTokenAmount) => {
+        assert.equal(bobsTokenAmount.valueOf(), CHOSEN_COMPENSATION)
+        done()
+      })
     })
   })
 })

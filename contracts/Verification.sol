@@ -21,9 +21,9 @@ contract Verification {
     _;
   }
 
-  function Verification(address membershipContractAddress, address tokenContractAddress) {
+  function Verification(address membershipContractAddress) {
     membership = Membership(membershipContractAddress);
-    token = Token(tokenContractAddress);
+    token = new Token();
   }
 
   function submit(string reportId, uint compensation) onlyByMember {

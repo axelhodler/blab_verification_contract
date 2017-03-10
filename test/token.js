@@ -22,27 +22,9 @@ contract('token - creation', accounts => {
     })
   })
 
-  describe('setting up the wiring', () => {
-    before(() => {
-      return tokenContract.setUpWiring(verificationContractAddress, {from: CONTRACT_CREATOR})
-    })
-
-    it('gives 100000 Tokens to the verification contract after setting up the wiring', () => {
-      return tokenContract.getBalance.call(verificationContractAddress).then(balance => {
-        assert.equal(balance.valueOf(), 100000)
-      })
-    })
-
-    it('sets the verificationcontract as the new owner', () => {
-      return tokenContract.owner.call().then(updatedOwner => {
-        assert.equal(updatedOwner, verificationContractAddress)
-      })
-    })
-
-    it('sets fullyInitialized to true', () => {
-      return tokenContract.initialized.call().then(initialized => {
-        assert.equal(initialized, true)
-      })
+  it('gives 100000 Tokens to the verification contract owner', () => {
+    return tokenContract.getBalance.call(CONTRACT_CREATOR).then(balance => {
+      assert.equal(balance.valueOf(), 100000)
     })
   })
 

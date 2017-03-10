@@ -1,20 +1,12 @@
 pragma solidity ^0.4.2;
 
 contract Token {
-  bool public initialized;
   address public owner;
   mapping (address => uint) balances;
 
   function Token() {
     owner = msg.sender;
-  }
-
-  function setUpWiring(address verificationContract) {
-    if (msg.sender == owner && !initialized) {
-      owner = verificationContract;
-      balances[owner] = 100000;
-      initialized = true;
-    }
+    balances[owner] = 100000;
   }
 
   function sendCoin(address receiver, uint amount) returns(bool sufficient) {
