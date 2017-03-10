@@ -4,11 +4,7 @@ var Token = artifacts.require("./Token.sol")
 
 module.exports = function(deployer) {
   return deployer.deploy(Membership).then(() => {
-    return Membership.deployed()
-  }).then(instance => {
-    return instance.address
-  }).then(membershipContractAddress => {
-    return deployer.deploy(Verification, membershipContractAddress)
+    return deployer.deploy(Verification)
   }).then(() => {
     return deployer.deploy(Token)
   })

@@ -42,6 +42,9 @@ contract('Verification', accounts => {
       return verificationContract.token.call()
     }).then(tokenContractAddress => {
       tokenContract = web3.eth.contract(Token.abi).at(tokenContractAddress)
+      return verificationContract.membership.call()
+    }).then(address => {
+      membershipContractAddress = address;
     })
   })
 
