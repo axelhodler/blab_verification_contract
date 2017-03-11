@@ -5,10 +5,10 @@ var Membership = artifacts.require('./Membership.sol')
 contract('Verification', accounts => {
   let verificationContract
   let tokenContract
-  let membershipContractAddress
-  let alice = accounts[0]
-  let bob = accounts[1]
-  let carol = accounts[2]
+  let membershipContract
+  let ALICE_THE_MEMBERMANAGER = accounts[0]
+  let BOB_THE_MEMBER = accounts[1]
+  let CAROL_THE_MEMBER = accounts[2]
   let NERO_THE_NONMEMBER = accounts[3]
 
   let verify = (reportId, account) => {
@@ -35,23 +35,24 @@ contract('Verification', accounts => {
     return Verification.deployed().then(instance => {
       verificationContract = instance
     }).then(() => {
-      return Membership.deployed()
-    }).then(membershipContract => {
-      membershipContractAddress = membershipContract.address
+      return verificationContract.membership.call()
+    }).then(membershipContractAddress => {
+      membershipContract = web3.eth.contract(Membership.abi).at(membershipContractAddress)
+      return membershipContract.addMember(BOB_THE_MEMBER, {from: ALICE_THE_MEMBERMANAGER})
+    }).then(() => {
+      return membershipContract.addMember(CAROL_THE_MEMBER, {from: ALICE_THE_MEMBERMANAGER})
     }).then(() => {
       return verificationContract.token.call()
     }).then(tokenContractAddress => {
       tokenContract = web3.eth.contract(Token.abi).at(tokenContractAddress)
       return verificationContract.membership.call()
-    }).then(address => {
-      membershipContractAddress = address;
     })
   })
 
   describe('setup', () => {
     it('knows the connected membership contract address', () => {
       return verificationContract.membership.call().then(membershipAddress => {
-        assert.equal(membershipAddress, membershipContractAddress)
+        assert.isTrue(membershipAddress.length === 42)
       })
     })
 
@@ -72,15 +73,15 @@ contract('Verification', accounts => {
     const report = 'DOCUMENT_HASH_0'
 
     it('sets the submitter in the report', () => {
-      return submit(report, alice).then(() => {
+      return submit(report, ALICE_THE_MEMBERMANAGER).then(() => {
         return verificationContract.submitterFor.call(report)
       }).then((submitter) => {
-        assert.equal(submitter, alice)
+        assert.equal(submitter, ALICE_THE_MEMBERMANAGER)
       })
     })
 
     it('is not allowed to submit the same report twice', done => {
-      submit(report, alice).catch(() => {
+      submit(report, ALICE_THE_MEMBERMANAGER).catch(() => {
         assert.ok(true)
         done()
       }).then(() => {
@@ -102,7 +103,7 @@ contract('Verification', accounts => {
 
   describe('verifying documents', () => {
     it('allows users to verify documents', () => {
-      return submit('DOCUMENT_HASH', alice).then(() => {
+      return submit('DOCUMENT_HASH', ALICE_THE_MEMBERMANAGER).then(() => {
         return verifiersFor('DOCUMENT_HASH')
       }).then(verifiers => {
         assert.equal(verifiers.length, 0)
@@ -112,10 +113,10 @@ contract('Verification', accounts => {
   })
 
   it('lists a document as valid after two verifications', () => {
-    return submit('2ND_DOCUMENT_HASH', alice).then(() => {
-      return verify('2ND_DOCUMENT_HASH', bob)
+    return submit('2ND_DOCUMENT_HASH', ALICE_THE_MEMBERMANAGER).then(() => {
+      return verify('2ND_DOCUMENT_HASH', BOB_THE_MEMBER)
     }).then(() => {
-      return verify('2ND_DOCUMENT_HASH', carol)
+      return verify('2ND_DOCUMENT_HASH', CAROL_THE_MEMBER)
     }).then(() => {
       return isValid('2ND_DOCUMENT_HASH')
     }).then(contractIsValid => {
@@ -124,10 +125,10 @@ contract('Verification', accounts => {
   })
 
   it('cannot be verified by the same person twice', () => {
-    return submit('3ND_DOCUMENT_HASH', alice).then(() => {
-      return verify('3ND_DOCUMENT_HASH', bob)
+    return submit('3ND_DOCUMENT_HASH', ALICE_THE_MEMBERMANAGER).then(() => {
+      return verify('3ND_DOCUMENT_HASH', BOB_THE_MEMBER)
     }).then(() => {
-      return verify('3ND_DOCUMENT_HASH', bob)
+      return verify('3ND_DOCUMENT_HASH', BOB_THE_MEMBER)
     }).then(() => {
       return verifiersFor('3ND_DOCUMENT_HASH')
     }).then((verifiers) => {
@@ -136,7 +137,7 @@ contract('Verification', accounts => {
   })
 
   it('is not possible for a nonmember to verify a report', done => {
-    submit('4TH_DOCUMENT_HASH', alice).then(() => {
+    submit('4TH_DOCUMENT_HASH', ALICE_THE_MEMBERMANAGER).then(() => {
       return verify('4TH_DOCUMENT_HASH', NERO_THE_NONMEMBER);
     }).catch(() => {
       done()
@@ -147,7 +148,7 @@ contract('Verification', accounts => {
   })
 
   it('is not possible to verify an unsubmitted report', done => {
-    verify('5ND_DOCUMENT_HASH', alice)
+    verify('5ND_DOCUMENT_HASH', ALICE_THE_MEMBERMANAGER)
       .catch(() => {
         assert.ok(true)
         done()
@@ -159,12 +160,12 @@ contract('Verification', accounts => {
 
   it('provides the amount of tokens the submitter chose after its fully verified', (done) => {
     const CHOSEN_COMPENSATION = 200;
-    submitWithCustomCompensation('WORK_DONE', CHOSEN_COMPENSATION, bob).then(() => {
-      return verify('WORK_DONE', alice)
+    submitWithCustomCompensation('WORK_DONE', CHOSEN_COMPENSATION, BOB_THE_MEMBER).then(() => {
+      return verify('WORK_DONE', ALICE_THE_MEMBERMANAGER)
     }).then(() => {
-      return verify('WORK_DONE', carol)
+      return verify('WORK_DONE', CAROL_THE_MEMBER)
     }).then(() => {
-      tokenContract.getBalance.call(bob, (err, bobsTokenAmount) => {
+      tokenContract.getBalance.call(BOB_THE_MEMBER, (err, bobsTokenAmount) => {
         assert.equal(bobsTokenAmount.valueOf(), CHOSEN_COMPENSATION)
         done()
       })

@@ -21,8 +21,8 @@ contract Verification {
     _;
   }
 
-  function Verification() {
-    membership = new Membership();
+  function Verification(address membershipManager) {
+    membership = new Membership(membershipManager);
     token = new Token();
   }
 
