@@ -24,7 +24,7 @@ verificationContract = compiled.contracts.Verification
 
 const Verification = web3.eth.contract(JSON.parse(verificationContract.interface))
 
-Verification.new({
+Verification.new(account, {
   data: '0x' + verificationContract.bytecode,
   from: account,
   gas: 2000000
